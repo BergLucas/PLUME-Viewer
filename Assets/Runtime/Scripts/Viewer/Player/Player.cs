@@ -7,7 +7,11 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Application = UnityEngine.Application;
+#if UNITY_ANDROID
+using NativeFilePickerNamespace;
+#elif UNITY_STANDALONE_WIN
 using System.Windows.Forms;
+#endif
 using Cysharp.Threading.Tasks;
 
 namespace PLUME.Viewer.Player
@@ -78,9 +82,6 @@ namespace PLUME.Viewer.Player
                 DontDestroyOnLoad(gameObject);
             }
 
-            var recordPath = GetRecordPath();
-            var bundlePath = GetBundlePath(recordPath);
-
             PreviewRenderTexture = RenderTexture.GetTemporary(1920, 1080);
             freeCamera.PreviewRenderTexture = PreviewRenderTexture;
             topViewCamera.PreviewRenderTexture = PreviewRenderTexture;
@@ -92,18 +93,6 @@ namespace PLUME.Viewer.Player
             SetCurrentPreviewCamera(mainCamera);
 
             PlayerModules = FindObjectsOfType<PlayerModule>();
-            _bundleLoader = new BundleLoader(bundlePath);
-
-            var assetBundleLoadTask = _bundleLoader.LoadAsync().ContinueWith(recordAssetBundle =>
-            {
-                RecordAssetBundle = recordAssetBundle;
-                _mainPlayerContext = PlayerContext.CreatePlayerContext(recordAssetBundle);
-                _mainPlayerContext.updatedHierarchy += mainContextUpdatedHierarchy;
-            });
-
-            _recordLoader = new RecordLoader(recordPath, typeRegistryProvider.GetTypeRegistry());
-
-            var recordLoadTask = _recordLoader.LoadAsync().ContinueWith(record => { Record = record; });
 
             OnFinishLoading += () =>
             {
@@ -115,10 +104,26 @@ namespace PLUME.Viewer.Player
                     GraphicsSettings.defaultRenderPipeline = null;
             };
 
-            UniTask.WhenAll(recordLoadTask, assetBundleLoadTask).ContinueWith(() => { OnFinishLoading(); }).Forget();
+            LoadAsync().ContinueWith(() => { OnFinishLoading(); }).Forget();
         }
 
-        private static string GetRecordPath()
+        private async UniTask LoadAsync() {
+            var recordPath = await GetRecordPath();
+            var bundlePath = await GetBundlePath(recordPath);
+
+            _bundleLoader = new BundleLoader(bundlePath);
+
+            RecordAssetBundle = await _bundleLoader.LoadAsync();
+
+            _mainPlayerContext = PlayerContext.CreatePlayerContext(RecordAssetBundle);
+            _mainPlayerContext.updatedHierarchy += mainContextUpdatedHierarchy;
+
+            _recordLoader = new RecordLoader(recordPath, typeRegistryProvider.GetTypeRegistry());
+
+            Record = await _recordLoader.LoadAsync();
+        }
+
+        private static async UniTask<string> GetRecordPath()
         {
             // Try to get the record file path from the command line arguments
             var arguments = Environment.GetCommandLineArgs();
@@ -135,6 +140,20 @@ namespace PLUME.Viewer.Player
 
 #if UNITY_EDITOR
             var filePath = EditorUtility.OpenFilePanel("Open record file", Application.dataPath, "plm");
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                return filePath;
+            }
+#elif UNITY_ANDROID
+            var tcs = new UniTaskCompletionSource<string>();
+
+            NativeFilePicker.PickFile((pickedPath) =>
+            {
+                tcs.TrySetResult(pickedPath);
+            }, new string[] { });
+
+            var filePath = await tcs.Task;
 
             if (!string.IsNullOrEmpty(filePath))
             {
@@ -159,7 +178,7 @@ namespace PLUME.Viewer.Player
             throw new FileNotFoundException("Failed to open record file.");
         }
 
-        private static string GetBundlePath(string recordFilePath = null)
+        private static async UniTask<string> GetBundlePath(string recordFilePath = null)
         {
             if (recordFilePath != null)
             {
@@ -180,6 +199,28 @@ namespace PLUME.Viewer.Player
                 }
             }
 
+#if UNITY_EDITOR
+            var filePath = EditorUtility.OpenFilePanel("Open asset bundle file", Application.dataPath, "zip");
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                return filePath;
+            }
+#elif UNITY_ANDROID
+            var tcs = new UniTaskCompletionSource<string>();
+
+            NativeFilePicker.PickFile((pickedPath) =>
+            {
+                tcs.TrySetResult(pickedPath);
+            }, new[] { "application/zip" });
+
+            var filePath = await tcs.Task;
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                return filePath;
+            }
+#elif UNITY_STANDALONE_WIN
             using (var fd = new OpenFileDialog())
             {
                 fd.Title = "Open asset bundle file";
@@ -192,6 +233,7 @@ namespace PLUME.Viewer.Player
                     return fd.FileName;
                 }
             }
+#endif
 
             Application.Quit(127);
             throw new FileNotFoundException("Failed to open bundle file.");
