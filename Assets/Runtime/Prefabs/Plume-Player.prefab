@@ -270,7 +270,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3527861557537485353
 Transform:
   m_ObjectHideFlags: 0
@@ -1065,6 +1065,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeRegistryProvider: {fileID: 27516560266712775}
   loop: 0
+  previewRenderTexture: {fileID: 8400000, guid: 5cf7293dda184f74e920fa26c0430ab1, type: 2}
   freeCamera: {fileID: 5243149662805609015}
   topViewCamera: {fileID: 5720294478372019317}
   mainCamera: {fileID: 4958596500381266705}

@@ -147,9 +147,17 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1041767726375591474, guid: b4a12f1ba345b14438d4ad048811be15, type: 3}
+      propertyPath: PreviewRenderTexture
+      value: 
+      objectReference: {fileID: 8400000, guid: 5cf7293dda184f74e920fa26c0430ab1, type: 2}
     - target: {fileID: 1622235944094969762, guid: b4a12f1ba345b14438d4ad048811be15, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3688873362705555609, guid: b4a12f1ba345b14438d4ad048811be15, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3853190476271717280, guid: b4a12f1ba345b14438d4ad048811be15, type: 3}
       propertyPath: m_LocalPosition.x
@@ -206,10 +214,6 @@ PrefabInstance:
     - target: {fileID: 5635019901420886447, guid: b4a12f1ba345b14438d4ad048811be15, type: 3}
       propertyPath: defaultInteractionType
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6271649878948817840, guid: b4a12f1ba345b14438d4ad048811be15, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7333346258209044708, guid: b4a12f1ba345b14438d4ad048811be15, type: 3}
       propertyPath: m_RequiresDepthTextureOption

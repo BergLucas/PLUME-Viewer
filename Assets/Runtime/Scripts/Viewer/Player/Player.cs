@@ -42,7 +42,7 @@ namespace PLUME.Viewer.Player
         private bool _isPlaying;
         private ulong _currentTimeNanoseconds;
 
-        public RenderTexture PreviewRenderTexture { get; private set; }
+        public RenderTexture previewRenderTexture;
 
         public event Action OnFinishLoading = delegate { };
 
@@ -81,11 +81,10 @@ namespace PLUME.Viewer.Player
                 transform.parent = null;
                 DontDestroyOnLoad(gameObject);
             }
-
-            PreviewRenderTexture = RenderTexture.GetTemporary(1920, 1080);
-            freeCamera.PreviewRenderTexture = PreviewRenderTexture;
-            topViewCamera.PreviewRenderTexture = PreviewRenderTexture;
-            mainCamera.PreviewRenderTexture = PreviewRenderTexture;
+            
+            freeCamera.PreviewRenderTexture = previewRenderTexture;
+            topViewCamera.PreviewRenderTexture = previewRenderTexture;
+            mainCamera.PreviewRenderTexture = previewRenderTexture;
             freeCamera.transform.position = new Vector3(-2.24f, 1.84f, 0.58f);
             freeCamera.transform.rotation = Quaternion.Euler(25f, -140f, 0f);
             topViewCamera.transform.position = new Vector3(0, 3.25f, -4);
@@ -242,7 +241,7 @@ namespace PLUME.Viewer.Player
         public void SetCurrentPreviewCamera(PreviewCamera camera)
         {
             var rt = RenderTexture.active;
-            RenderTexture.active = PreviewRenderTexture;
+            RenderTexture.active = previewRenderTexture;
             GL.Clear(true, true, Color.clear);
             RenderTexture.active = rt;
 
@@ -273,7 +272,6 @@ namespace PLUME.Viewer.Player
 
         public void OnDestroy()
         {
-            PreviewRenderTexture.Release();
             _recordLoader.Dispose();
         }
 

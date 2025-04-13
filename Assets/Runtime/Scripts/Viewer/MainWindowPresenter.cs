@@ -45,7 +45,7 @@ namespace PLUME.Viewer
             _mainWindowUI.PreviewRenderAspectRatio.RegisterCallback<NavigationMoveEvent>(OnPreviewRenderNavigationMove);
             _mainWindowUI.PreviewRenderAspectRatio.RegisterCallback<KeyDownEvent>(OnPreviewRenderKeyDown);
             _mainWindowUI.PreviewRender.style.backgroundImage =
-                Background.FromRenderTexture(player.PreviewRenderTexture);
+                Background.FromRenderTexture(player.previewRenderTexture);
 
             _mainWindowUI.Timeline.RegisterCallback<KeyDownEvent>(OnPlayPauseKeyDown);
             _mainWindowUI.PlayPauseButton.RegisterCallback<KeyDownEvent>(OnPlayPauseKeyDown);
