@@ -35,8 +35,6 @@ namespace PLUME
 
             var assetType = Type.GetType(assetTypeName) ?? typeof(Object);
 
-            Debug.Log($"'{assetType}' '{assetPath}' '{assetName}' '{assetSource}'");
-            
             var asset = assetSource switch
             {
                 "Custom" => LoadCustomAsset(assetType, assetPath, assetName),
