@@ -360,7 +360,7 @@ namespace PLUME.Viewer.Player
 
         public float GetRecordAssetBundleLoadingProgress()
         {
-            return _bundleLoader.GetLoadingProgress();
+            return _bundleLoader?.GetLoadingProgress() ?? 0;
         }
 
         public void SetPlaySpeed(float playSpeed)
