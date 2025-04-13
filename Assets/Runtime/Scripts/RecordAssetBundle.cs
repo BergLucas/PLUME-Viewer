@@ -35,8 +35,6 @@ namespace PLUME
 
             var assetType = Type.GetType(assetTypeName) ?? typeof(Object);
 
-            Debug.Log($"'{assetType}' '{assetPath}' '{assetName}' '{assetSource}'");
-            
             var asset = assetSource switch
             {
                 "Custom" => LoadCustomAsset(assetType, assetPath, assetName),
@@ -50,6 +48,11 @@ namespace PLUME
         private Object LoadCustomAsset(Type assetType, string assetPath, string assetName)
         {
             var assets = _assetBundle.LoadAssetWithSubAssets(assetPath, assetType);
+            if (assets == null || assets.Length == 0)
+            {
+                Debug.LogWarning($"Asset '{assetPath}' not found in asset bundle.");
+                return null;
+            }
             return assets.FirstOrDefault(asset => asset.name == assetName);
         }
 
